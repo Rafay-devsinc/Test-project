@@ -1,8 +1,14 @@
 name: CI
 
 on:
+  # push:
+  #   branches: [ feature/test-workflow]
   pull_request:
-    branches: [ main ]
+    branches: [ main]
+
+  # pull_request_target:
+  #   branches: [ main ]
+
 
 jobs:
   test:
@@ -46,18 +52,15 @@ jobs:
           kubectl port-forward svc/bar 8082:80 &
           # Wait a few seconds for port-forwarding to start
           sleep 5    
-
-      - name: Install Go and hey
+      - name: Install Go, hey and run load test
         run: |
-         curl -LO https://golang.org/dl/go1.21.2.linux-amd64.tar.gz
-         sudo tar -C /usr/local -xzf go1.21.2.linux-amd64.tar.gz
-         export GOPATH=$GITHUB_WORKSPACE/go
-         export PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
-         go install github.com/rakyll/hey@latest
-
-
-      - name: Run load test
-        run: scripts/load_test.sh
+          curl -LO https://golang.org/dl/go1.21.2.linux-amd64.tar.gz
+          sudo tar -C /usr/local -xzf go1.21.2.linux-amd64.tar.gz
+          export GOPATH=$GITHUB_WORKSPACE/go
+          export PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
+          go install github.com/rakyll/hey@latest
+          bash scripts/load_test.sh
+ 
 
       - name: Post PR Comment with Results
         run: python3 scripts/post_pr_comment.py
