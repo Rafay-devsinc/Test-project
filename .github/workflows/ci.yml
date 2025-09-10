@@ -1,8 +1,8 @@
 name: CI
 
 on:
-  push:
-    branches: [ feature/test-workflow]
+  # push:
+  #   branches: [ feature/test-workflow]
   pull_request:
     branches: [ main ]
 
