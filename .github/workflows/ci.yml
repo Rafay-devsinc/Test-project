@@ -4,7 +4,7 @@ on:
   # push:
   #   branches: [ feature/test-workflow]
   pull_request:
-    branches: [ main ]
+    branches: [ ]
 
   # pull_request_target:
   #   branches: [ main ]
