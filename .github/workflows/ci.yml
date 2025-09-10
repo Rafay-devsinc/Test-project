@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install KinD
+        run: |
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.24.0/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+      - name: Create KinD cluster
+        run: kind create cluster --config k8s/kind-config.yaml
+
+      - name: Install Ingress Controller
+        run: |
+          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+          kubectl wait --namespace ingress-nginx             --for=condition=ready pod             --selector=app.kubernetes.io/component=controller             --timeout=180s
+
+      - name: Deploy foo/bar + ingress
+        run: |
+          kubectl apply -f k8s/foo-deployment.yaml
+          kubectl apply -f k8s/bar-deployment.yaml
+          kubectl apply -f k8s/ingress.yaml
+          kubectl wait --for=condition=available --timeout=120s deployment/foo
+          kubectl wait --for=condition=available --timeout=120s deployment/bar
+
+      - name: Install hey for load testing
+        run: go install github.com/rakyll/hey@latest
+        env:
+          GOROOT: /usr/local/go
+          GOPATH: $HOME/go
+          PATH: $HOME/go/bin:/usr/local/go/bin:$PATH
+
+      - name: Run load test
+        run: scripts/load_test.sh
+
+      - name: Post PR Comment with Results
+        run: python3 scripts/post_pr_comment.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
