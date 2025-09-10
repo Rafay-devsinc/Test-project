@@ -39,6 +39,14 @@ jobs:
           kubectl wait --for=condition=available --timeout=120s deployment/foo
           kubectl wait --for=condition=available --timeout=120s deployment/bar
 
+      - name: Port-forward foo/bar services
+        run: |
+          # Port-forward foo to 8081 and bar to 8082
+          kubectl port-forward svc/foo 8081:80 &
+          kubectl port-forward svc/bar 8082:80 &
+          # Wait a few seconds for port-forwarding to start
+          sleep 5    
+
       - name: Install Go
         run: |
          curl -LO https://golang.org/dl/go1.21.2.linux-amd64.tar.gz
