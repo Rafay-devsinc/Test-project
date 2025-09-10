@@ -57,7 +57,7 @@ jobs:
 
 
       - name: Run load test
-        run: scripts/load_test.sh
+        run: bash scripts/load_test.sh
 
       - name: Post PR Comment with Results
         run: python3 scripts/post_pr_comment.py
