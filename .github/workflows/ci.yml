@@ -39,6 +39,13 @@ jobs:
           kubectl wait --for=condition=available --timeout=120s deployment/foo
           kubectl wait --for=condition=available --timeout=120s deployment/bar
 
+      - name: Install Go
+        run: |
+         curl -LO https://golang.org/dl/go1.21.2.linux-amd64.tar.gz
+         sudo tar -C /usr/local -xzf go1.21.2.linux-amd64.tar.gz
+         echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> $GITHUB_ENV
+    
+
       - name: Install hey for load testing
         run: go install github.com/rakyll/hey@latest
         env:
