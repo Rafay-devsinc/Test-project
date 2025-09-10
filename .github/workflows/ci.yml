@@ -3,8 +3,12 @@ name: CI
 on:
   # push:
   #   branches: [ feature/test-workflow]
-  pull_request:
+  # pull_request:
+  #   branches: [ main ]
+
+  pull_request_target:
     branches: [ main ]
+
 
 jobs:
   test:
