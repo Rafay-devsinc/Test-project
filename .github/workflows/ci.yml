@@ -47,19 +47,14 @@ jobs:
           # Wait a few seconds for port-forwarding to start
           sleep 5    
 
-      - name: Install Go
+      - name: Install Go and hey
         run: |
          curl -LO https://golang.org/dl/go1.21.2.linux-amd64.tar.gz
          sudo tar -C /usr/local -xzf go1.21.2.linux-amd64.tar.gz
-         echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> $GITHUB_ENV
-    
+         export GOPATH=$GITHUB_WORKSPACE/go
+         export PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
+         go install github.com/rakyll/hey@latest
 
-      - name: Install hey for load testing
-        run: go install github.com/rakyll/hey@latest
-        env:
-          GOROOT: /usr/local/go
-          GOPATH: $HOME/go
-          PATH: $HOME/go/bin:/usr/local/go/bin:$PATH
 
       - name: Run load test
         run: scripts/load_test.sh
