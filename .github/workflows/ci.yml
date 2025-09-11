@@ -1,13 +1,8 @@
 name: CI
 
 on:
-  # push:
-  #   branches: [ feature/test-workflow]
   pull_request:
     branches: [ main]
-
-  # pull_request_target:
-  #   branches: [ main ]
 
 permissions:
   contents: read
