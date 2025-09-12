@@ -44,6 +44,10 @@ jobs:
           kubectl wait --for=condition=available --timeout=120s deployment/foo
           kubectl wait --for=condition=available --timeout=120s deployment/bar
 
+          kubectl get nodes 
+          kubectl get pods -o wide 
+          kubectl get all
+         
       - name: Port-forward foo/bar services
         run: |
           # Port-forward foo to 8081 and bar to 8082
